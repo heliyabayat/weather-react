@@ -1,21 +1,19 @@
 import React from "react";
 import { useState } from "react";
-export default function SearchData({ city, onAddCity }) {
+export default function SearchData({
+  city,
+  onAddCity,
+  onChangeTemp,
+  temp,
+  unit,
+  isInList,
+}) {
   const [currentTime] = useState(new Date().toLocaleString("en-US"));
-  const [currentUnit, setCurrentUnit] = useState("°C");
-  const [currentTemp, setCurrentTemp] = useState(
-    Math.round(city.main.temp - 273)
-  );
+
   const onClickHandler = () => {
-    if (currentUnit === "°C") {
-      setCurrentTemp(Math.round(currentTemp * 1.8 + 32));
-      setCurrentUnit("°F");
-    }
-    if (currentUnit === "°F") {
-      setCurrentTemp(Math.round((currentTemp - 32) / 1.8));
-      setCurrentUnit("°C");
-    }
+    onChangeTemp();
   };
+
   const onAddClickHandler = (city) => {
     onAddCity(city);
   };
@@ -24,16 +22,31 @@ export default function SearchData({ city, onAddCity }) {
     <ul className="list-group">
       <li className="list-group-item d-flex align-items-center gap-3 justify-content-between">
         <div className="d-flex flex-column align-items-start">
-          <h1 className="mb-0">
-            {city.name}{" "}
+          <div className="d-flex flex-column align-items-start gap-3">
+            <p className="lead mb-0">
+              <span className="fw-bold text-uppercase text-primary">
+                {city.name}
+              </span>
+              {" - "}
+              <span>{city.weather[0].description}</span>
+            </p>
             <span
-              className="badge bg-dark"
+              className="btn btn-sm btn-dark"
               onClick={() => onAddClickHandler(city.name)}
             >
-              add to favorites
+              {isInList ? (
+                <>
+                  <i className="bi bi-bookmark-dash"></i>
+                  <span className="ms-1">Remove from Favorites</span>
+                </>
+              ) : (
+                <>
+                  <i className="bi bi-bookmark-plus"></i>
+                  <span className="ms-1">Add to Favorites</span>
+                </>
+              )}
             </span>
-          </h1>
-          <p className="lead m-0">{city.weather[0].description}</p>
+          </div>
         </div>
         <div className="d-flex align-items-center">
           <img
@@ -45,8 +58,8 @@ export default function SearchData({ city, onAddCity }) {
             style={{ cursor: "pointer" }}
             onClick={onClickHandler}
           >
-            <strong>{Math.round(city.main.temp - 273)}</strong>
-            <sup>{currentUnit}</sup>
+            <strong>{temp}</strong>
+            <sup>{unit}</sup>
           </h2>
         </div>
       </li>
