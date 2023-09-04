@@ -15,7 +15,7 @@ export default function SearchBar() {
   const fetchCityData = async (name) => {
     await axios
       .get(
-        `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=f8e6a9e3d6fde87cb38868da460b1371`
+        `https://api.openweathermap.org/data/2.5/weather?q=${name.toLowerCase()}&appid=f8e6a9e3d6fde87cb38868da460b1371`
       )
       .then(function (response) {
         setCity(response.data);
@@ -29,7 +29,9 @@ export default function SearchBar() {
         console.log("successful get request");
       });
     await axios
-      .get(`https://api.teleport.org/api/urban_areas/slug:${name}/images/`)
+      .get(
+        `https://api.teleport.org/api/urban_areas/slug:${name.toLowerCase()}/images/`
+      )
       .then(({ data }) => {
         setImage(data.photos[0].image.web);
       })
