@@ -10,9 +10,13 @@ export default function SearchBar() {
   const [error, setError] = useState();
   const [temp, setTemp] = useState();
   const [currentUnit, setCurrentUnit] = useState("°C");
-  const fetchCityData = async (url) => {
-    const response = await axios
-      .get(url)
+  const [image, setImage] = useState();
+
+  const fetchCityData = async (name) => {
+    await axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=f8e6a9e3d6fde87cb38868da460b1371`
+      )
       .then(function (response) {
         setCity(response.data);
         setTemp(Math.round(response.data.main.temp - 273));
@@ -24,15 +28,21 @@ export default function SearchBar() {
       .finally(function () {
         console.log("successful get request");
       });
+    await axios
+      .get(`https://api.teleport.org/api/urban_areas/slug:${name}/images/`)
+      .then(({ data }) => {
+        setImage(data.photos[0].image.web);
+      })
+      .catch(setImage(null));
   };
+
   const onChangeHandler = (event) => {
     setCityInput(event.target.value);
   };
 
-  const [cityList, setCityList] = useState(localStorage.getItem("cityList"));
+  const [cityList, setCityList] = useState([]);
   const onCityClickHandler = (item) => {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${item}&appid=f8e6a9e3d6fde87cb38868da460b1371`;
-    fetchCityData(url);
+    fetchCityData(item);
   };
 
   const onCloseClickHandler = (item) => {
@@ -44,8 +54,7 @@ export default function SearchBar() {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput}&appid=f8e6a9e3d6fde87cb38868da460b1371`;
-    fetchCityData(url);
+    fetchCityData(cityInput);
   };
   const onChangeTempHandler = () => {
     if (currentUnit === "°C") {
@@ -72,13 +81,9 @@ export default function SearchBar() {
     }
   };
 
-  useEffect(() => {
-    localStorage.setItem("cityList", cityList);
-  }, [cityList]);
-
   return (
     <div className="d-flex flex-column gap-3">
-      {error && <div class="alert alert-danger">{error}</div>}
+      {error && <div className="alert alert-danger">{error}</div>}
       <form className="d-flex search-bar" onSubmit={onSubmitHandler}>
         <input
           type="text"
@@ -94,6 +99,7 @@ export default function SearchBar() {
           Search
         </button>
       </form>
+      {image && <img src={image} alt={city.name} />}
       {city ? (
         <SearchData
           city={city}
@@ -107,7 +113,7 @@ export default function SearchBar() {
         <div className="alert alert-info">No data!</div>
       )}
       <h3 className="display-1 text-capitalize">favorite cities</h3>
-      {cityList.length > 0 ? (
+      {cityList && cityList.length > 0 ? (
         <div className="d-flex align-items-center justify-content-center gap-3">
           {cityList.map((item) => (
             <div key={item} className="position-relative">
