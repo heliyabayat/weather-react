@@ -114,7 +114,7 @@ export default function SearchBar() {
       ) : (
         <div className="alert alert-info">No data!</div>
       )}
-      <h3 className="display-1 text-capitalize">favorite cities</h3>
+      <h3 className="fs-1 text-capitalize ">favorite cities</h3>
       {cityList && cityList.length > 0 ? (
         <div className="d-flex align-items-center justify-content-center gap-3">
           {cityList.map((item) => (
